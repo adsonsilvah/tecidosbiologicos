@@ -140,7 +140,7 @@ function scene:create( event )
         
     end)
 
-    local som = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+    local som = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
     som.x = display.contentCenterX
     som.y = display.contentCenterY + 400
 
@@ -152,11 +152,11 @@ function scene:create( event )
             if isSoundOn then
                 audio.stop()
                 isSoundOn = false
-                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
-            else
-                audio.play(backgroundSound, { loops = -1 })
-                isSoundOn = true
                 newImage = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+            else
+                audio.play(backgroundSound, { loops = 0 })
+                isSoundOn = true
+                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
             end
     
             newImage.x = som.x
@@ -188,7 +188,7 @@ function scene:show(event)
 
         -- Reproduz o som de fundo
         if not isSoundOn then
-            audio.play(backgroundSound, { loops = -1 })
+            audio.play(backgroundSound, { loops = 0 })
             isSoundOn = true
         end
     end

@@ -4,53 +4,47 @@ local audio = require("audio")
 local backgroundSound 
 local isSoundOn = false 
 local MARGIN = 20
-
--- Variáveis globais para animação
 local frameIndex = 1
 local totalFrames = 23
-local frames = {} -- Armazena as imagens carregadas
-local arrowsInTargets = {} -- Verifica se ambas as setas estão em alvos
-local animationTimer -- Inicializa a variável no escopo global do módulo
-local interactionCompleted = false -- Controla o estado da interação
+local frames = {} 
+local arrowsInTargets = {} 
+local animationTimer 
+local interactionCompleted = false 
 
--- Posições-alvo para as setas
 local targetPositions = {
     { x = display.contentCenterX - 250, y = display.contentCenterY + 25 },
     { x = display.contentCenterX - 250, y = display.contentCenterY + 150 }
 }
 
--- Posição central da animação
+
 local animationPosition = { x = display.contentCenterX + 150, y = display.contentCenterY + 100 }
 
--- Função para resetar variáveis de estado
+
 local function resetInteractionState()
     arrowsInTargets = { arrow1 = false, arrow2 = false }
     interactionCompleted = false
-    frameIndex = 1 -- Reinicia o índice dos frames
-    -- Torna apenas o primeiro frame visível
+    frameIndex = 1 
     for i, frame in ipairs(frames) do
         frame.isVisible = (i == 1)
     end
 end
 
--- Função para iniciar ou reiniciar a animação
+
 local function startAnimation()
-    -- Cancela o timer anterior, se existir
     if animationTimer then
         timer.cancel(animationTimer)
         animationTimer = nil
     end
 
-    -- Reinicia a lógica de alternância dos frames
     animationTimer = timer.performWithDelay(100, function()
-        -- Esconde o frame atual
+        
         frames[frameIndex].isVisible = false
-        -- Incrementa o índice do frame
+        
         frameIndex = frameIndex + 1
         if frameIndex > totalFrames then
-            frameIndex = 1 -- Reinicia a animação
+            frameIndex = 1 
         end
-        -- Mostra o próximo frame
+        
         frames[frameIndex].isVisible = true
     end, 0)
 end
@@ -59,7 +53,6 @@ end
 function scene:create(event)
     local sceneGroup = self.view
 
-    -- Reseta o estado ao criar a cena
     resetInteractionState()
 
     -- Carrega a imagem de fundo
@@ -68,7 +61,7 @@ function scene:create(event)
     bg.y = display.contentCenterY
 
     --botão volume
-    local btnsom = display.newImage(sceneGroup, "/assets/bottons/som-ligado.png")
+    local btnsom = display.newImage(sceneGroup, "/assets/bottons/som-desligado.png")
     btnsom.x = display.contentCenterX
     btnsom.y = display.contentCenterY + 400
 
@@ -86,7 +79,6 @@ function scene:create(event)
     btnext.x = display.contentWidth - btnext.width / 2 - MARGIN - 40
     btnext.y = display.contentHeight - btnext.height / 2 - MARGIN - 50
 
-    -- Alvos visuais para as setas
     local targets = {}
     for i, position in ipairs(targetPositions) do
         local target = display.newRect(sceneGroup, position.x, position.y, 100, 100)
@@ -94,12 +86,11 @@ function scene:create(event)
         targets[i] = target
     end
 
-    -- Carregar as setas
     local arrows = {}
     arrows[1] = display.newImage(sceneGroup, "assets/pages/pag-5/arrows.png")
     arrows[2] = display.newImage(sceneGroup, "assets/pages/pag-5/arrows-1.png")
 
-    -- Configura limites verticais para a posição das setas
+    
     local arrowMinY = text1.y + 175
     local arrowMaxY = math.min(btnprev.y, btnext.y) - 50
 
@@ -108,36 +99,35 @@ function scene:create(event)
         arrow.y = math.random(arrowMinY, arrowMaxY)
     end
 
-    -- Carregar as 23 imagens da animação
     for i = 1, totalFrames do
         local frame = display.newImage(sceneGroup, "assets/pages/pag-5/DNA/" .. i .. ".png")
         frame.x = animationPosition.x
         frame.y = animationPosition.y
-        frame.isVisible = (i == 1) -- Apenas o primeiro frame está visível inicialmente
+        frame.isVisible = (i == 1) 
         table.insert(frames, frame)
     end
 
-    -- Inicia a animação do DNA
+    
     startAnimation()
 
-    -- Função para verificar se ambas as setas estão posicionadas corretamente
+    
     local function checkAllArrows()
         if arrowsInTargets.arrow1 and arrowsInTargets.arrow2 and not interactionCompleted then
-            interactionCompleted = true -- Marca a interação como concluída para evitar múltiplas ativações
+            interactionCompleted = true 
 
-            -- Move as setas em direção à animação
+            
             transition.to(arrows[1], { x = animationPosition.x - 30, y = animationPosition.y, time = 500 })
             transition.to(arrows[2], { x = animationPosition.x + 30, y = animationPosition.y, time = 500, onComplete = function()
-                -- Para a animação do DNA
-                if animationTimer then -- Verifica se o timer existe antes de cancelar
+                
+                if animationTimer then
                     timer.cancel(animationTimer)
                     animationTimer = nil
                 end
                 for _, frame in ipairs(frames) do
-                    frame.isVisible = false -- Esconde todos os frames
+                    frame.isVisible = false 
                 end
 
-                -- Mostra a quebra do DNA na posição da animação
+                
                 local brokenLeft = display.newImage(sceneGroup, "assets/pages/pag-5/dna_broke_left.png")
                 local brokenRight = display.newImage(sceneGroup, "assets/pages/pag-5/dna_broke_rigth.png")
 
@@ -147,13 +137,12 @@ function scene:create(event)
                 brokenRight.x = animationPosition.x + 30
                 brokenRight.y = animationPosition.y
 
-                -- Faz os pedaços caírem
+                
                 transition.to(brokenLeft, { y = display.contentHeight + 100, time = 1000 })
                 transition.to(brokenRight, {
                     y = display.contentHeight + 100,
                     time = 1000,
                     onComplete = function()
-                        -- Aguarda 3 segundos antes de reiniciar a cena
                         timer.performWithDelay(1000, function()
                             composer.removeScene("pag5.pag_5", true)
                             composer.gotoScene("pag5.pag_5", {
@@ -245,7 +234,7 @@ function scene:create(event)
         
     end)
 
-    local som = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+    local som = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
     som.x = display.contentCenterX
     som.y = display.contentCenterY + 400
 
@@ -257,11 +246,11 @@ function scene:create(event)
             if isSoundOn then
                 audio.stop()
                 isSoundOn = false
-                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
-            else
-                audio.play(backgroundSound, { loops = -1 })
-                isSoundOn = true
                 newImage = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+            else
+                audio.play(backgroundSound, { loops = 0 })
+                isSoundOn = true
+                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
             end
     
             newImage.x = som.x
@@ -286,7 +275,7 @@ function scene:show(event)
 
     if phase == "did" then
         if not isSoundOn then
-            audio.play(backgroundSound, { loops = -1 })
+            audio.play(backgroundSound, { loops = 0 })
             isSoundOn = true
         end
     end

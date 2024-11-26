@@ -3,7 +3,7 @@ local scene = composer.newScene()
 local audio = require("audio")
 
 local MARGIN = 20
-local sun -- Declaração global do objeto `sun` para reiniciar sua posição
+local sun
 local backgroundSound 
 local isSoundOn = false 
 
@@ -62,14 +62,12 @@ function scene:create(event)
             return
         end
 
-        -- Transição entre a primeira e a segunda imagem (do início ao meio da tela)
         if posX <= midX then
             local progress = (posX - minX) / (midX - minX)
             progress = math.max(0, math.min(1, progress))
             images[1].alpha = 1 - progress
             images[2].alpha = progress
             images[3].alpha = 0
-        -- Transição entre a segunda e a terceira imagem (do meio ao final da tela)
         elseif posX > midX and posX <= maxX then
             local progress = (posX - midX) / (maxX - midX)
             progress = math.max(0, math.min(1, progress))
@@ -87,7 +85,6 @@ function scene:create(event)
         elseif event.phase == "moved" then
             local newX = event.x - event.target.touchOffsetX
 
-            -- Restringir o movimento dentro dos limites
             if newX < minX then
                 newX = minX
             elseif newX > maxX then
@@ -96,7 +93,6 @@ function scene:create(event)
 
             event.target.x = newX
 
-            -- Atualizar as imagens com base na posição do sol
             updateImages(newX)
         elseif event.phase == "ended" or event.phase == "cancelled" then
             display.currentStage:setFocus(nil)
@@ -104,7 +100,6 @@ function scene:create(event)
         return true
     end
 
-    -- Adicionar o evento de toque ao sol
     sun:addEventListener("touch", onTouch)
 
     -- Botão "voltar"
@@ -156,7 +151,7 @@ function scene:create(event)
         
     end)
 
-    local som = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+    local som = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
     som.x = display.contentCenterX
     som.y = display.contentCenterY + 400
 
@@ -168,11 +163,11 @@ function scene:create(event)
             if isSoundOn then
                 audio.stop()
                 isSoundOn = false
-                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
-            else
-                audio.play(backgroundSound, { loops = -1 })
-                isSoundOn = true
                 newImage = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+            else
+                audio.play(backgroundSound, { loops = 0 })
+                isSoundOn = true
+                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
             end
     
             newImage.x = som.x
@@ -201,7 +196,7 @@ function scene:show(event)
 
     if phase == "did" then
         if not isSoundOn then
-            audio.play(backgroundSound, { loops = -1 })
+            audio.play(backgroundSound, { loops = 0 })
             isSoundOn = true
         end
     end
@@ -225,18 +220,11 @@ function scene:hide(event)
             isSoundOn = false
         end
     end
-
-    -- if (phase == "will") then
-    --     -- Código para quando a cena está prestes a sair
-    -- elseif (phase == "did") then
-    --     -- Código para quando a cena sai completamente
-    -- end
 end
 
 -- destroy()
 function scene:destroy(event)
     local sceneGroup = self.view
-    -- Código para limpar recursos (se necessário)
     if backgroundSound then
         audio.dispose(backgroundSound)
         backgroundSound = nil

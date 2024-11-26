@@ -33,8 +33,8 @@ function scene:create(event)
     maquina.x, maquina.y = display.contentCenterX + 175, 600
 
     local btninvisivel = display.newRect(sceneGroup, display.contentCenterX + 175, 600, 50, 50)
-    btninvisivel.isVisible = false -- Invisível para o usuário
-    btninvisivel.isHitTestable = true -- Permite interações mesmo invisível
+    btninvisivel.isVisible = false
+    btninvisivel.isHitTestable = true 
 
     local maca = display.newImage(sceneGroup, "assets/pages/pag-4/maca.png")
     maca.x, maca.y = display.contentCenterX, 600
@@ -46,18 +46,16 @@ function scene:create(event)
     local raiox = display.newImage(sceneGroup, "assets/pages/pag-4/raiox.png")
     raiox.x, raiox.y = display.contentCenterX, display.contentCenterY
     raiox.isVisible = false
-    raiox:scale(0.1, 0.1) -- Começa com zoom reduzido
+    raiox:scale(0.1, 0.1) 
 
     -- Função para detectar movimento do acelerômetro
     local function onAccelerate(event)
         local xGravity = event.xGravity
         local yGravity = event.yGravity
 
-        -- Movimenta o feixe de luz baseado na inclinação
         feixe.x = feixe.x + (xGravity * 50)
         feixe.y = feixe.y + (yGravity * 50)
 
-        -- Limita a posição do feixe dentro da tela
         feixe.x = math.max(0, math.min(display.contentWidth, feixe.x))
         feixe.y = math.max(0, math.min(display.contentHeight, feixe.y))
     end
@@ -75,7 +73,6 @@ function scene:create(event)
 
     -- Adiciona evento ao botão invisível
     btninvisivel:addEventListener("tap", function(event)
-        -- Verifica se o feixe está alinhado com o ombro da pessoa
         if math.abs(feixe.x - pessoa.x) < 50 and math.abs(feixe.y - pessoa.y) < 50 then
             showRaioX()
         end
@@ -131,7 +128,7 @@ function scene:create(event)
         
     end)
 
-    local som = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+    local som = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
     som.x = display.contentCenterX
     som.y = display.contentCenterY + 400
 
@@ -143,11 +140,11 @@ function scene:create(event)
             if isSoundOn then
                 audio.stop()
                 isSoundOn = false
-                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
-            else
-                audio.play(backgroundSound, { loops = -1 })
-                isSoundOn = true
                 newImage = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+            else
+                audio.play(backgroundSound, { loops = 0 })
+                isSoundOn = true
+                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
             end
     
             newImage.x = som.x
@@ -173,7 +170,7 @@ function scene:show(event)
 
     if phase == "did" then
         if not isSoundOn then
-            audio.play(backgroundSound, { loops = -1 })
+            audio.play(backgroundSound, { loops = 0 })
             isSoundOn = true
         end
     end
@@ -192,7 +189,6 @@ function scene:hide(event)
     end
 
     if phase == "will" then
-        -- Code here runs when the scene is on screen (but is about to go off screen)
         Runtime:removeEventListener("accelerometer", onAccelerate)
     end
 end

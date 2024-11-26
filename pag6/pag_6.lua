@@ -7,8 +7,8 @@ local backgroundSound
 local isSoundOn = false 
 
 local MARGIN = 20
-local boyRedness = 0 -- Nível de vermelhidão do menino (0 a 1)
-local arrowSpeed = 1500 -- Velocidade das setas
+local boyRedness = 0 
+local arrowSpeed = 1500 
 -- create()
 function scene:create( event )
     local sceneGroup = self.view
@@ -44,16 +44,16 @@ function scene:create( event )
     boy.y = display.contentCenterY + 235
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
-     -- Função para mudar a cor do menino conforme os raios solares
+     
     local function updateBoyColor()
-        boyRedness = math.min(boyRedness + 0.1, 1) -- Aumenta a vermelhidão até o máximo (1)
-        boy:setFillColor(1, 1 - boyRedness, 1 - boyRedness) -- Ajusta o vermelho
+        boyRedness = math.min(boyRedness + 0.1, 1) 
+        boy:setFillColor(1, 1 - boyRedness, 1 - boyRedness) 
 
-        -- Reseta a coloração do menino ao atingir o tom máximo de vermelho
+
         if boyRedness >= 1 then
             timer.performWithDelay(500, function()
-                boyRedness = 0 -- Reseta a vermelhidão
-                boy:setFillColor(1, 1, 1) -- Retorna à coloração normal
+                boyRedness = 0 
+                boy:setFillColor(1, 1, 1) 
             end)
         end
     end
@@ -65,7 +65,6 @@ function scene:create( event )
         arrow.x = sol.x
         arrow.y = sol.y + 50
 
-        -- Movimento das setas em direção ao menino
         transition.to(arrow, {
             x = boy.x,
             y = boy.y,
@@ -73,9 +72,9 @@ function scene:create( event )
             onComplete = function()
                 -- Verifica se o guarda-sol está protegendo o menino
                 if math.abs(arrow.x - guarda.x) < 50 and math.abs(arrow.y - guarda.y) < 100 then
-                    display.remove(arrow) -- Setas atingem o guarda-sol e desaparecem
+                    display.remove(arrow) 
                 elseif math.abs(arrow.x - boy.x) < 50 and math.abs(arrow.y - boy.y) < 50 then
-                    updateBoyColor() -- Setas atingem o menino e aumentam a vermelhidão
+                    updateBoyColor() 
                     display.remove(arrow)
                 else
                     display.remove(arrow)
@@ -99,10 +98,10 @@ function scene:create( event )
         return true
     end
 
-    -- Adiciona evento de toque ao guarda-sol
+    
     guarda:addEventListener("touch", dragGuarda)
 
-    -- Criação contínua de setas
+    
     timer.performWithDelay(1000, createArrow, 0)
 
     -- Botão "Voltar"
@@ -154,7 +153,7 @@ function scene:create( event )
         
     end)
 
-    local som = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+    local som = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
     som.x = display.contentCenterX
     som.y = display.contentCenterY + 400
 
@@ -166,11 +165,11 @@ function scene:create( event )
             if isSoundOn then
                 audio.stop()
                 isSoundOn = false
-                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
-            else
-                audio.play(backgroundSound, { loops = -1 })
-                isSoundOn = true
                 newImage = display.newImage(sceneGroup, "assets/bottons/som-ligado.png")
+            else
+                audio.play(backgroundSound, { loops = 0 })
+                isSoundOn = true
+                newImage = display.newImage(sceneGroup, "assets/bottons/som-desligado.png")
             end
     
             newImage.x = som.x
@@ -195,7 +194,7 @@ function scene:show(event)
 
     if phase == "did" then
         if not isSoundOn then
-            audio.play(backgroundSound, { loops = -1 })
+            audio.play(backgroundSound, { loops = 0 })
             isSoundOn = true
         end
     end
